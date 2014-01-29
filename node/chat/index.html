@@ -6,17 +6,52 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script>
+    function createCookie(name, value, days) {
+        var expires;
+
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toGMTString();
+        } else {
+            expires = "";
+        }
+        document.cookie = escape(name) + "=" + escape(value) + expires + "; path=/";
+    }
+
+    function readCookie(name) {
+        var nameEQ = escape(name) + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return unescape(c.substring(nameEQ.length, c.length));
+        }
+        return null;
+    }
+
+    function eraseCookie(name) {
+        createCookie(name, "", -1);
+    }
+
+
   var socket = io.connect('http://192.168.5.194:8080');
 
   // on connection to server, ask for user's name with an anonymous callback
   socket.on('connect', function(){
     // call the server-side function 'adduser' and send one parameter (value of prompt)
-    socket.emit('adduser', prompt("What's your name?"));
+//    socket.emit('adduser', prompt("What's your name?"));
   });
 
   // listener, whenever the server emits 'updatechat', this updates the chat body
   socket.on('updatechat', function (username, data) {
-    $('#conversation').append('<span class="chat_username">'+username + ':</span> ' + data + '<br>');
+      var nickname = readCookie('user');
+   if(username == nickname){
+       $('#conversation').append('<span class="chat_username_me">'+username + ':</span> ' + data + '<br>');
+   }
+      else{
+       $('#conversation').append('<span class="chat_username">'+username + ':</span> ' + data + '<br>');
+   }
   });
 
   // listener, whenever the server emits 'updateusers', this updates the username list
@@ -30,7 +65,7 @@
   // on load of page
   $(function(){
     // when the client clicks SEND
-    $('#datasend').click( function() {
+    $('#datasend').on( "click", function() {
       var message = $('#data').val();
       $('#data').val('');
       // tell server to execute 'sendchat' and send along one parameter
@@ -44,6 +79,18 @@
         $('#datasend').focus().click();
       }
     });
+
+      $('#loginsend').on( "click", function() {
+          var nickname = $('#login').val();
+          socket.emit('adduser', nickname);
+          $('.login').addClass('hide');
+          $('.typer_wrap').removeClass('hide');
+//          console.log(socket.username);
+//          console.log(usernames);
+          createCookie('user', nickname, 3);
+      });
+
+
   });
 
 </script>
@@ -59,7 +106,7 @@
     <div class="conversation">
         <div id="conversation"></div>
         <div class="typer_wrap  hide">
-        <input id="data"/>
+        <input id="data" placeholder="Message"/>
         <input type="button" id="datasend" value="send"/>
         </div>
         <div class="login">

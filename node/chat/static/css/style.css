@@ -120,6 +120,10 @@ header{
     height: 28px;
 }
 
+#users{
+    margin-top: 10px;
+}
+
 #datasend{
     width: 67px;
     display: inline-block;
@@ -176,4 +180,16 @@ header{
     color: black;
     font-weight: bold;
     font-size: 17px;
+    color: #FF9933;
+}
+
+.chat_users{
+    color: #FF9933;
+    font-weight: bold;
+    font-size: 22px;
+    padding: 3px;
+}
+
+.chat_username_me{
+    color: #99CCCC;
 }
