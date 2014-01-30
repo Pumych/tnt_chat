@@ -40,7 +40,19 @@
   // on connection to server, ask for user's name with an anonymous callback
   socket.on('connect', function(){
     // call the server-side function 'adduser' and send one parameter (value of prompt)
-//    socket.emit('adduser', prompt("What's your name?"));
+
+      var cockranval;
+      socket.emit('get_cookienum', '', function (cookienam) {
+          cockranval = cookienam;
+          var nickname = readCookie(cockranval);
+          if (nickname != null) {
+              socket.emit('adduser', nickname);
+              $('.login').addClass('hide');
+              $('.typer_wrap').removeClass('hide');
+          }
+      });
+
+
   });
 
   // listener, whenever the server emits 'updatechat', this updates the chat body
@@ -82,12 +94,37 @@
 
       $('#loginsend').on( "click", function() {
           var nickname = $('#login').val();
+          var cockranval;
           socket.emit('adduser', nickname);
           $('.login').addClass('hide');
           $('.typer_wrap').removeClass('hide');
-//          console.log(socket.username);
-//          console.log(usernames);
-          createCookie('user', nickname, 3);
+          socket.emit('get_cookienum', '', function(cookienam){
+              cockranval = cookienam;
+              createCookie(cockranval, nickname, 3600);
+          });
+
+      });
+
+      $('#change_nick').on( "click", function() {
+          var cockranval, nicky;
+          socket.emit('get_cookienum', '', function(cookienam){
+              cockranval = cookienam;
+              eraseCookie(cockranval);
+          });
+          socket.emit('curentuser', '', function (user) {
+              nicky = user;
+              socket.emit('removeuser', nicky);
+          });
+          $('.login').removeClass('hide');
+          $('.typer_wrap').addClass('hide');
+
+//          $('.login').removeClass('hide');
+//          $('.typer_wrap').addClass('display');
+//          socket.emit('disconnect');
+//          socket.emit('curentuser', '', function(user){
+//               nicky = user;
+//          });
+
       });
 
 
@@ -106,8 +143,9 @@
     <div class="conversation">
         <div id="conversation"></div>
         <div class="typer_wrap  hide">
-        <input id="data" placeholder="Message"/>
-        <input type="button" id="datasend" value="send"/>
+            <input id="data" placeholder="Message"/>
+            <input type="button" id="datasend" value="send"/>
+            <input type="button" id="change_nick" value="Change Nick Name"/>
         </div>
         <div class="login">
             <input id="login" type="text" placeholder="Nick name"/>

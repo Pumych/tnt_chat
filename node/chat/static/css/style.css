@@ -115,7 +115,7 @@ header{
 }
 
 #data {
-    width: 500px;
+    width: 485px;
     display: inline-block;
     height: 28px;
 }
@@ -192,4 +192,19 @@ header{
 
 .chat_username_me{
     color: #99CCCC;
+}
+
+#change_nick{
+    display: inline-block;
+    width: auto;
+    height: 42px;
+    background-color: #47a447;
+    border-color: #398439;
+    color: #ffffff;
+}
+
+#change_nick:hover{
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+
 }
